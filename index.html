@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>Cloud In Motion</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Montserrat:wght@600;800&display=swap">
+<style>
+/* Layout: dark hero with a journey card, then problem, five-step flow, and the working tracker. */
+:root {
+  --bg: #EEF2F5;
+  --surface: #FFFFFF;
+  --fg: #242525;
+  --muted: #565A5C;
+  --line: #D3DBE1;
+  --field: #9AA5AC;
+  --soft: #AABBC8;
+  --grey: #686B6C;
+  --btn-bg: #242525;
+  --btn-fg: #F4F7F9;
+  --focus: #3F6C8E;
+  --hero: #242525;
+  --hero-fg: #F4F7F9;
+  --hero-muted: #C4CED6;
+  --fresh: #E4EDF3;
+  --err: #A8281F;
+  --transit-bg: #D9E3EB; --transit-fg: #2B4254;
+  --customs-bg: #F4E6C8; --customs-fg: #5C4410;
+  --delivered-bg: #D5E8D9; --delivered-fg: #1F4D2B;
+  --delayed-bg: #F2D6D3; --delayed-fg: #6A1F18;
+  --display: 'Montserrat', 'Arial Black', Arial, sans-serif;
+  --body: 'DM Sans', system-ui, -apple-system, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #181919; --surface: #242626; --fg: #EEF2F5; --muted: #A7B1B7; --line: #3A3E40; --field: #5B6265;
+    --btn-bg: #AABBC8; --btn-fg: #242525; --focus: #AABBC8; --fresh: #2E3A44; --err: #F0A8A1;
+    --transit-bg: #2D3B47; --transit-fg: #C3D3E0;
+    --customs-bg: #4A3D1E; --customs-fg: #EBD7A0;
+    --delivered-bg: #25402B; --delivered-fg: #BFE0C6;
+    --delayed-bg: #4C2724; --delayed-fg: #F0C4BF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #181919; --surface: #242626; --fg: #EEF2F5; --muted: #A7B1B7; --line: #3A3E40; --field: #5B6265;
+  --btn-bg: #AABBC8; --btn-fg: #242525; --focus: #AABBC8; --fresh: #2E3A44; --err: #F0A8A1;
+  --transit-bg: #2D3B47; --transit-fg: #C3D3E0;
+  --customs-bg: #4A3D1E; --customs-fg: #EBD7A0;
+  --delivered-bg: #25402B; --delivered-fg: #BFE0C6;
+  --delayed-bg: #4C2724; --delayed-fg: #F0C4BF;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.55; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.wrap { max-width: 1120px; margin-inline: auto; padding-inline: 20px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; line-height: 1.12; }
+h3 { font-size: 20px; font-weight: 800; line-height: 1.25; }
+p { margin: 0; }
+.eyebrow { font-size: 14px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+.lead { color: var(--muted); max-width: 62ch; }
+
+/* top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--hero); color: var(--hero-fg); }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; }
+.brand { font-family: var(--display); font-weight: 800; font-size: 17px; text-decoration: none; white-space: nowrap; }
+.top nav { display: flex; gap: 18px; }
+.top nav a { text-decoration: none; font-weight: 500; font-size: 15px; color: var(--hero-muted); }
+.top nav a:hover { color: var(--hero-fg); }
+
+/* hero */
+.hero { background: var(--hero); color: var(--hero-fg); }
+.hero-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 48px; align-items: center; padding-block: 72px 80px; }
+.hero-grid > * { min-width: 0; }
+.hero .eyebrow { color: var(--soft); }
+.hero h1 { font-size: clamp(46px, 8vw, 88px); font-weight: 800; line-height: 1.02; margin-block: 16px 20px; }
+.hero .lead { color: var(--hero-muted); font-size: 19px; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 22px; border: 0; border-radius: 10px; background: var(--btn-bg); color: var(--btn-fg); font: 700 16px var(--body); text-decoration: none; cursor: pointer; }
+.btn.light { background: var(--soft); color: #242525; }
+.btn.ghost { background: transparent; color: var(--hero-fg); border: 1px solid rgba(244, 247, 249, 0.45); }
+.bands { display: flex; height: 12px; }
+.bands span:nth-child(1) { flex: 5; background: #242525; }
+.bands span:nth-child(2) { flex: 2.5; background: #686B6C; }
+.bands span:nth-child(3) { flex: 2; background: #AABBC8; }
+
+.journey { border: 1px solid rgba(244, 247, 249, 0.2); border-radius: 16px; padding: 28px; background: rgba(244, 247, 249, 0.05); }
+.journey .eyebrow { font-size: 13px; }
+.journey ol { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 0; }
+.journey li { position: relative; padding: 0 0 22px 32px; border-left: 2px solid var(--grey); margin-left: 7px; }
+.journey li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.journey li::before { content: ""; position: absolute; left: -9px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--soft); border: 3px solid var(--hero); box-shadow: 0 0 0 2px var(--soft); }
+.journey li.next::before { background: var(--hero); }
+.journey b { display: block; font-size: 18px; }
+.journey span { color: var(--hero-muted); font-size: 15px; }
+.journey .note { margin-top: 18px; font-size: 14px; color: var(--hero-muted); }
+
+/* sections */
+section.block { padding-block: 72px; }
+.head { display: grid; gap: 14px; margin-bottom: 36px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; }
+.cards > * { min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 28px; display: grid; gap: 10px; align-content: start; }
+.card .eyebrow { color: var(--muted); font-size: 13px; }
+.card p { color: var(--muted); }
+.stats { display: flex; flex-wrap: wrap; gap: 20px 56px; margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--line); }
+.stats div { min-width: 0; }
+.stats strong { display: block; font-family: var(--display); font-size: clamp(40px, 6vw, 60px); font-weight: 800; line-height: 1; }
+.stats span { color: var(--muted); font-size: 16px; }
+.fine { margin-top: 14px; font-size: 14px; color: var(--muted); }
+
+.alt { background: var(--surface); border-block: 1px solid var(--line); }
+.flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 14px; counter-reset: step; }
+.flow li { counter-increment: step; border-radius: 14px; padding: 22px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.flow li::before { content: counter(step); font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1; }
+.flow .edge { background: var(--soft); color: #242525; }
+.flow .cloud { background: var(--grey); color: #F4F7F9; }
+.flow p { font-size: 16px; }
+.flow-note { margin-top: 18px; color: var(--muted); }
+
+/* tracker */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: grid; gap: 24px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; font-size: 14px; font-weight: 700; white-space: nowrap; }
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.s-transit { background: var(--transit-bg); color: var(--transit-fg); }
+.s-customs { background: var(--customs-bg); color: var(--customs-fg); }
+.s-delivered { background: var(--delivered-bg); color: var(--delivered-fg); }
+.s-delayed { background: var(--delayed-bg); color: var(--delayed-fg); }
+.chips .pill { font-size: 15px; padding: 6px 14px; }
+form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; align-items: end; }
+form > * { min-width: 0; }
+label { display: grid; gap: 6px; font-size: 14px; font-weight: 700; }
+input, select { width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid var(--field); border-radius: 10px; background: var(--surface); color: var(--fg); font: 400 16px var(--body); }
+.msg { min-height: 24px; font-size: 15px; color: var(--muted); }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; min-width: 600px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th { text-align: left; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 12px 16px; border-bottom: 1px solid var(--line); }
+td { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+td.id { font-weight: 700; font-family: var(--display); }
+tr.fresh td { background: var(--fresh); }
+.tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.link { background: none; border: 0; padding: 8px 0; color: var(--fg); font: 700 15px var(--body); text-decoration: underline; cursor: pointer; }
+.next-step { margin-top: 28px; padding: 24px 28px; border-radius: 14px; background: var(--hero); color: var(--hero-fg); display: grid; gap: 6px; }
+.next-step .eyebrow { color: var(--soft); font-size: 13px; }
+.next-step p:last-child { color: var(--hero-muted); }
+
+footer { background: var(--hero); color: var(--hero-muted); padding-block: 28px; font-size: 15px; }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+
+
+/* registration */
+[hidden] { display: none !important; }
+.top nav a.navbtn { background: var(--soft); color: #242525; padding: 8px 16px; border-radius: 8px; font-weight: 700; }
+#register { border-bottom: 1px solid var(--line); }
+.reg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 48px; align-items: start; }
+.reg-grid > * { min-width: 0; }
+.reg-copy { display: grid; gap: 16px; }
+.reg-points { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; color: var(--muted); }
+.reg-points li { padding-left: 22px; position: relative; }
+.reg-points li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 10px; height: 10px; border-radius: 50%; background: var(--soft); }
+form.reg-form { grid-template-columns: 1fr; align-items: start; gap: 18px; }
+.field { display: grid; gap: 6px; }
+.err { min-height: 0; font-size: 14px; font-weight: 500; color: var(--err); }
+input[aria-invalid="true"], select[aria-invalid="true"] { border-color: var(--err); border-width: 2px; }
+.pw { position: relative; }
+.pw input { padding-right: 84px; }
+.pw .show { position: absolute; right: 6px; top: 6px; min-height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--fg); font: 700 14px var(--body); text-decoration: underline; cursor: pointer; }
+.meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 4px; }
+.meter span { height: 6px; border-radius: 3px; background: var(--line); }
+.meter span.on { background: var(--btn-bg); }
+.hint { font-size: 14px; color: var(--muted); }
+label.check { display: flex; align-items: flex-start; gap: 10px; font-weight: 400; font-size: 15px; }
+label.check input { width: 22px; min-height: 22px; height: 22px; margin: 2px 0 0; flex: none; }
+.done { display: grid; gap: 14px; justify-items: start; }
+
+
+/* text link above the page, and the separate register view */
+.strip { background: var(--bg); border-bottom: 1px solid var(--line); }
+.strip-in { display: flex; justify-content: flex-end; align-items: center; gap: 8px; min-height: 42px; font-size: 15px; color: var(--muted); }
+.strip a { font-weight: 700; color: var(--fg); text-decoration: underline; }
+.back { justify-self: start; font-weight: 700; font-size: 15px; text-decoration: underline; }
+#register { display: none; min-height: 70vh; }
+body.view-register #register { display: block; }
+#tracker { display: none; }
+body.view-tracker #tracker { display: block; }
+body.view-register .home-view, body.view-tracker .home-view { display: none; }
+
+@media (max-width: 520px) {
+  .top nav { gap: 14px; }
+  .hero-grid { padding-block: 48px 56px; }
+  section.block { padding-block: 52px; }
+  .panel { padding: 16px; }
+}
+</style>
+
+<div class="strip">
+  <div class="wrap strip-in"><span>New here?</span><a href="#register">Register</a></div>
+</div>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#top">Cloud In Motion</a>
+    <nav aria-label="Sections">
+      <a href="#tracker">Tracker</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero home-view">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Real-time global logistics</p>
+        <h1>Cloud In Motion</h1>
+        <p class="lead">See where every parcel is the moment it moves. A cloud computing case study, with a working parcel tracker you can try below.</p>
+        <div class="cta">
+          <a class="btn light" href="#register">Create an account</a>
+          <a class="btn ghost" href="#tracker">Open the tracker</a>
+        </div>
+      </div>
+      <aside class="journey" aria-label="Example parcel journey">
+        <p class="eyebrow">Example journey · KL-1042</p>
+        <ol>
+          <li><b>Kochi</b><span>Scanned at the sender's depot</span></li>
+          <li><b>Dubai hub</b><span>Cleared customs, loaded on a flight</span></li>
+          <li><b>London</b><span>Landed, moving to the local depot</span></li>
+          <li class="next"><b>Doorstep</b><span>Next scan updates everyone at once</span></li>
+        </ol>
+        <p class="note">Sample data for illustration.</p>
+      </aside>
+    </div>
+    <div class="bands" aria-hidden="true"><span></span><span></span><span></span></div>
+  </section>
+
+
+
+  <section class="block" id="register">
+    <div class="wrap reg-grid">
+      <div class="reg-copy">
+        <a class="back" href="#top">← Back to home</a>
+        <p class="eyebrow">Register</p>
+        <h2>Create your account</h2>
+        <p class="lead">Sign up to follow your parcels in one place. This is the front end only: the form checks your details here, and the real sign-up with Firebase comes in a later step.</p>
+        <ul class="reg-points">
+          <li>Choose your role: customer, sender or courier.</li>
+          <li>Your password strength is shown as you type.</li>
+          <li>Nothing you type here is saved or sent anywhere.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <form id="reg-form" class="reg-form" novalidate>
+          <div class="field">
+            <label for="reg-name">Full name<input id="reg-name" autocomplete="name" maxlength="60" aria-describedby="err-name"></label>
+            <p class="err" id="err-name"></p>
+          </div>
+          <div class="field">
+            <label for="reg-email">Email address<input id="reg-email" type="email" autocomplete="email" maxlength="80" placeholder="you@example.com" aria-describedby="err-email"></label>
+            <p class="err" id="err-email"></p>
+          </div>
+          <div class="field">
+            <label for="reg-role">I am a
+              <select id="reg-role" aria-describedby="err-role">
+                <option value="">Choose a role</option>
+                <option>Customer</option>
+                <option>Sender</option>
+                <option>Courier</option>
+              </select>
+            </label>
+            <p class="err" id="err-role"></p>
+          </div>
+          <div class="field">
+            <label for="reg-pass">Password</label>
+            <div class="pw">
+              <input id="reg-pass" type="password" autocomplete="new-password" maxlength="64" aria-describedby="pw-hint err-pass">
+              <button class="show" id="reg-show" type="button" aria-pressed="false" aria-controls="reg-pass">Show</button>
+            </div>
+            <div class="meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+            <p class="hint" id="pw-hint">Use 8 or more characters with upper and lower case letters, a number and a symbol.</p>
+            <p class="err" id="err-pass"></p>
+          </div>
+          <div class="field">
+            <label for="reg-pass2">Confirm password<input id="reg-pass2" type="password" autocomplete="new-password" maxlength="64" aria-describedby="err-pass2"></label>
+            <p class="err" id="err-pass2"></p>
+          </div>
+          <div class="field">
+            <label class="check" for="reg-terms"><input id="reg-terms" type="checkbox" aria-describedby="err-terms"><span>I understand this is a student demo and nothing is saved.</span></label>
+            <p class="err" id="err-terms"></p>
+          </div>
+          <button class="btn" type="submit">Create account</button>
+        </form>
+        <div class="done" id="reg-done" hidden role="status">
+          <h3 id="done-title"></h3>
+          <p class="lead">Your details passed every check. This is a demo, so no account was created and nothing was saved or sent.</p>
+          <button class="btn" id="reg-again" type="button">Register another account</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="tracker">
+    <div class="wrap">
+      <div class="head">
+        <a class="back" href="#top">← Back to home</a>
+        <p class="eyebrow">The prototype</p>
+        <h2>Live Parcel Tracker</h2>
+        <p class="lead">Add a scan and the table updates instantly. Open this page in a second tab and add a scan there to watch the first tab change on its own.</p>
+      </div>
+      <div class="panel">
+        <div class="chips" id="chips" aria-label="Parcels by status"></div>
+        <form id="scan-form" novalidate>
+          <label for="parcel-id">Parcel ID<input id="parcel-id" autocomplete="off" placeholder="KL-1042" maxlength="20"></label>
+          <label for="place">Where is it now?<input id="place" autocomplete="off" placeholder="Dubai hub" maxlength="40"></label>
+          <label for="status">Status
+            <select id="status">
+              <option>In transit</option>
+              <option>At customs</option>
+              <option>Delayed</option>
+              <option>Delivered</option>
+            </select>
+          </label>
+          <button class="btn" type="submit">Add scan</button>
+        </form>
+        <p class="msg" id="msg" role="status" aria-live="polite"></p>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Parcel</th><th>Latest place</th><th>Status</th><th>Updated</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div class="tools">
+          <p class="fine" style="margin:0">The first four rows are example parcels. Adding a scan for an existing ID updates that parcel.</p>
+          <button class="link" id="reset" type="button">Reset examples</button>
+        </div>
+      </div>
+      <div class="next-step">
+        <p class="eyebrow">Coming next</p>
+        <h3>Move the data into the cloud</h3>
+        <p>Right now the scans are saved only in this browser. The next step connects Firebase, so every phone and laptop sees the same live table.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap"><span>Cloud In Motion · Real-time global logistics</span><span>First-year CS case study · [Your Name]</span></div>
+</footer>
+
+<script>
+(function () {
+  var KEY = "cloud-in-motion-scans";
+  var STATUS = {
+    "In transit": "s-transit",
+    "At customs": "s-customs",
+    "Delayed": "s-delayed",
+    "Delivered": "s-delivered"
+  };
+
+  // Example parcels shown the first time the page opens
+  function seed() {
+    var h = 3600000, now = Date.now();
+    return [
+      { id: "KL-1042", place: "Dubai hub", status: "In transit", t: now - 2 * h },
+      { id: "MB-2210", place: "Abu Dhabi customs", status: "At customs", t: now - 5 * h },
+      { id: "CH-0877", place: "Singapore", status: "Delivered", t: now - 9 * h },
+      { id: "DL-3391", place: "Sydney port", status: "Delayed", t: now - 26 * h }
+    ];
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { return JSON.parse(raw); }
+    } catch (e) {}
+    return null;
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(scans)); } catch (e) {}
+  }
+
+  var scans = load() || seed();
+  var tbody = document.getElementById("rows");
+  var chips = document.getElementById("chips");
+  var msg = document.getElementById("msg");
+
+  function ago(t) {
+    var m = Math.round((Date.now() - t) / 60000);
+    if (m < 1) { return "just now"; }
+    if (m < 60) { return m + " min ago"; }
+    var h = Math.round(m / 60);
+    if (h < 24) { return h + " h ago"; }
+    return Math.round(h / 24) + " d ago";
+  }
+
+  function pill(status) {
+    var s = document.createElement("span");
+    s.className = "pill " + (STATUS[status] || "s-transit");
+    s.textContent = status;
+    return s;
+  }
+
+  function render(freshId) {
+    tbody.textContent = "";
+    chips.textContent = "";
+    var counts = {};
+    scans.slice().sort(function (a, b) { return b.t - a.t; }).forEach(function (s) {
+      counts[s.status] = (counts[s.status] || 0) + 1;
+      var tr = document.createElement("tr");
+      if (s.id === freshId) { tr.className = "fresh"; }
+      var c1 = document.createElement("td"); c1.className = "id"; c1.textContent = s.id;
+      var c2 = document.createElement("td"); c2.textContent = s.place;
+      var c3 = document.createElement("td"); c3.appendChild(pill(s.status));
+      var c4 = document.createElement("td"); c4.textContent = ago(s.t);
+      tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3); tr.appendChild(c4);
+      tbody.appendChild(tr);
+    });
+    Object.keys(STATUS).forEach(function (name) {
+      var p = pill(name);
+      p.textContent = (counts[name] || 0) + " " + name.toLowerCase();
+      chips.appendChild(p);
+    });
+    if (freshId) {
+      setTimeout(function () {
+        var f = tbody.querySelector("tr.fresh");
+        if (f) { f.className = ""; }
+      }, 1800);
+    }
+  }
+
+  document.getElementById("scan-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var idEl = document.getElementById("parcel-id");
+    var placeEl = document.getElementById("place");
+    var id = idEl.value.trim().toUpperCase();
+    var place = placeEl.value.trim();
+    if (!id || !place) {
+      msg.textContent = "Enter a parcel ID and a place, then add the scan.";
+      return;
+    }
+    scans = scans.filter(function (s) { return s.id !== id; });
+    scans.push({ id: id, place: place, status: document.getElementById("status").value, t: Date.now() });
+    save();
+    render(id);
+    msg.textContent = "Saved scan for " + id + ".";
+    idEl.value = "";
+    placeEl.value = "";
+    idEl.focus();
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    scans = seed();
+    save();
+    render();
+    msg.textContent = "Example parcels restored.";
+  });
+
+  // Another tab saved a scan: reload the list and redraw
+  window.addEventListener("storage", function (e) {
+    if (e.key === KEY) {
+      scans = load() || scans;
+      render();
+    }
+  });
+
+  render();
+  setInterval(function () { render(); }, 60000);
+})();
+
+(function () {
+  function $(id) { return document.getElementById(id); }
+  var form = $("reg-form");
+  var done = $("reg-done");
+  var f = {
+    name: $("reg-name"), email: $("reg-email"), role: $("reg-role"),
+    pass: $("reg-pass"), pass2: $("reg-pass2"), terms: $("reg-terms")
+  };
+
+  // How many of the 4 password rules are met
+  function score(p) {
+    var s = 0;
+    if (p.length >= 8) { s++; }
+    if (/[a-z]/.test(p) && /[A-Z]/.test(p)) { s++; }
+    if (/\d/.test(p)) { s++; }
+    if (/[^A-Za-z0-9]/.test(p)) { s++; }
+    return s;
+  }
+
+  // Each check returns an error message, or "" when the field is fine
+  var check = {
+    name: function () {
+      return f.name.value.trim().length >= 2 ? "" : "Enter your full name.";
+    },
+    email: function () {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim()) ? "" : "Enter an email like name@example.com.";
+    },
+    role: function () {
+      return f.role.value ? "" : "Choose a role.";
+    },
+    pass: function () {
+      var p = f.pass.value;
+      if (p.length < 8) { return "Use at least 8 characters."; }
+      return score(p) >= 3 ? "" : "Add upper and lower case letters, a number or a symbol.";
+    },
+    pass2: function () {
+      return f.pass2.value && f.pass2.value === f.pass.value ? "" : "The two passwords must match.";
+    },
+    terms: function () {
+      return f.terms.checked ? "" : "Tick the box to continue.";
+    }
+  };
+
+  function show(key) {
+    var msg = check[key]();
+    $("err-" + key).textContent = msg;
+    if (msg) { f[key].setAttribute("aria-invalid", "true"); } else { f[key].removeAttribute("aria-invalid"); }
+    return !msg;
+  }
+
+  Object.keys(f).forEach(function (key) {
+    var evt = (key === "role" || key === "terms") ? "change" : "blur";
+    f[key].addEventListener(evt, function () { show(key); });
+    f[key].addEventListener("input", function () {
+      if (f[key].getAttribute("aria-invalid")) { show(key); }
+    });
+  });
+
+  // Strength bar
+  var bars = form.querySelectorAll(".meter span");
+  var labels = ["Too short", "Weak", "Fair", "Good", "Strong"];
+  f.pass.addEventListener("input", function () {
+    var p = f.pass.value;
+    var s = p ? score(p) : 0;
+    for (var i = 0; i < bars.length; i++) { bars[i].className = i < s ? "on" : ""; }
+    $("pw-hint").textContent = p ? "Password strength: " + labels[s] + "." : "Use 8 or more characters with upper and lower case letters, a number and a symbol.";
+    if (f.pass2.value) { show("pass2"); }
+  });
+
+  // Show or hide the password
+  $("reg-show").addEventListener("click", function () {
+    var hidden = f.pass.type === "password";
+    f.pass.type = hidden ? "text" : "password";
+    f.pass2.type = f.pass.type;
+    this.textContent = hidden ? "Hide" : "Show";
+    this.setAttribute("aria-pressed", hidden ? "true" : "false");
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var firstBad = null;
+    Object.keys(f).forEach(function (key) {
+      if (!show(key) && !firstBad) { firstBad = f[key]; }
+    });
+    if (firstBad) { firstBad.focus(); return; }
+    $("done-title").textContent = "Welcome, " + f.name.value.trim().split(/\s+/)[0] + ".";
+    form.hidden = true;
+    done.hidden = false;
+    form.reset();
+    for (var i = 0; i < bars.length; i++) { bars[i].className = ""; }
+    $("pw-hint").textContent = "Use 8 or more characters with upper and lower case letters, a number and a symbol.";
+  });
+
+  $("reg-again").addEventListener("click", function () {
+    done.hidden = true;
+    form.hidden = false;
+    f.name.focus();
+  });
+})();
+
+(function () {
+  // Switch between the home view and the register view in the same window
+  function setView(v) {
+    document.body.classList.toggle("view-register", v === "register");
+    document.body.classList.toggle("view-tracker", v === "tracker");
+  }
+  function route() {
+    setView(location.hash === "#register" ? "register" : location.hash === "#tracker" ? "tracker" : "home");
+  }
+  var links = document.querySelectorAll('a[href="#register"], a[href="#top"], a[href="#tracker"]');
+  Array.prototype.forEach.call(links, function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var h = a.getAttribute("href");
+      setView(h === "#register" ? "register" : h === "#tracker" ? "tracker" : "home");
+      try { history.replaceState(null, "", h); } catch (err) {}
+      window.scrollTo(0, 0);
+    });
+  });
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+
+</body>
+</html>
